@@ -1,1 +1,1 @@
-export const APP_NAME = "AppName"
+export const APP_NAME = "11-11 Coach"

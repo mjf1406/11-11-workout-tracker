@@ -1,28 +1,39 @@
-import TopNav from "~/components/navigation/TopNav";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "~/components/ui/accordion";
+import { Dumbbell } from "lucide-react";
+import Link from "next/link";
+import FrequentlyAskedQuestions from "~/components/brand/FAQ";
+import MainNav from "~/components/navigation/MainNav";
+import { Button } from "~/components/ui/button";
 
 export default function HomePage() {
   return (
     <>
-      <TopNav />
-      <main className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center gap-32 p-5">
+      <MainNav />
+      <main className="flex min-h-screen flex-col items-center justify-center gap-32 bg-background p-5 text-foreground">
         <div
           id="hero"
           className="container flex h-dvh flex-col items-center justify-center gap-12 px-4 py-16"
         >
           <div className="flex items-center gap-3">
             <h1 className="flex flex-col text-5xl font-extrabold tracking-tight">
-              <span className="text-primary">Your.</span>
-              <span className="text-accent">Tagline.</span>
+              <span className="text-primary">Your exercises.</span>
+              <span className="text-accent">Uniformly shuffled.</span>
             </h1>
           </div>
           <div className="max-w-lg text-center text-xl tracking-tight md:text-2xl">
-            Your quick description.
+            Say goodbye to workout planning! With our randomized 11-11 workouts,
+            you&apos;ll get a fresh set of exercises every day. Just focus on
+            your fitness while we ensure you never repeat the same routine
+            (within reason).
+          </div>
+          <div className="flex gap-5">
+            <Button asChild>
+              <Link href={"/workout"}>
+                <Dumbbell className="mr-2" /> Workout
+              </Link>
+            </Button>
+            <Button asChild variant={"secondary"}>
+              <Link href={"#features"}>Learn more</Link>
+            </Button>
           </div>
         </div>
         <div className="container flex h-dvh flex-col items-center justify-center gap-12 px-4 py-16">
@@ -35,17 +46,7 @@ export default function HomePage() {
             Pricing
           </h2>
         </div>
-        <div className="container flex h-dvh max-w-4xl flex-col items-center justify-center gap-12 px-4 py-16">
-          <h2 id="faq" className="scroll-m-20 text-4xl">
-            FAQ
-          </h2>
-          <Accordion type="single" collapsible className="min-w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>Question #1?</AccordionTrigger>
-              <AccordionContent>Answer to Question #1.</AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
+        <FrequentlyAskedQuestions />
       </main>
     </>
   );

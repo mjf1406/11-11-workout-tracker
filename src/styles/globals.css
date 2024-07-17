@@ -75,7 +75,7 @@ html {
 /* Clerk Modifiecations */
 
 .cl-formButtonPrimary {
-  @apply bg-primary text-background transform-none text-xs;
+  @apply transform-none bg-primary text-xs text-background;
 }
 
 .cl-formButtonPrimary:hover,

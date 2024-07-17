@@ -2,6 +2,20 @@
 
 This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for the dependencies if necessary.
 
+## To-do
+
+- Modals
+  - create exercise
+  - edit exercise
+- Pages
+  - home
+  - dashboard
+  - current workout
+  - settings
+    - user can change how many of each type goes into the final workout routines, like have 2 upper body push, 0 legs, etc.
+
+## Change Log
+
 ## First Steps
 
 1. npm install
