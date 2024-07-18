@@ -45,6 +45,7 @@ const MainNav = () => {
 
   return (
     <header className="sticky top-0 z-20 w-full border-b border-accent bg-background">
+      {/* <header className="fixed bottom-0 z-20 w-full border-t border-accent bg-background md:sticky md:bottom-0 lg:top-0 lg:border-b lg:border-t-0"> */}
       <div className="mx-auto max-w-5xl px-4">
         <div className="flex items-center justify-between py-4">
           <NavLogo />

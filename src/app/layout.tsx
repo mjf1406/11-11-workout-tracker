@@ -1,5 +1,5 @@
 import "~/styles/globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, GoogleOneTap } from "@clerk/nextjs";
 import { poppins } from "./fonts";
 import { Toaster } from "~/components/ui/toaster";
 import { ThemeProvider } from "~/components/theme/theme-provider";
@@ -27,6 +27,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <GoogleOneTap />
             <main>{children}</main>
             <Toaster />
           </ThemeProvider>
