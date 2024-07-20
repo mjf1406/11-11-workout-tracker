@@ -157,7 +157,7 @@ export default function Workout() {
   return (
     <>
       <MainNav />
-      <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background p-5 text-foreground">
+      <main className="flex flex-col items-center justify-center gap-8 bg-background p-5 text-foreground">
         <h1 className="text-4xl">Workout</h1>
         <WorkoutActions />
         <div>

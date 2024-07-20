@@ -4,7 +4,7 @@ export default function Dashboard() {
   return (
     <>
       <MainNav />
-      <main className="flex min-h-screen flex-col items-center justify-center gap-32 bg-background p-5 text-foreground">
+      <main className="flex flex-col items-center justify-center gap-8 bg-background p-5 text-foreground">
         <div className="text-4xl">Dashboard</div>
       </main>
     </>

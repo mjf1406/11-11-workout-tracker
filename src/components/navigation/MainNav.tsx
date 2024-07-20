@@ -19,10 +19,8 @@ const MainNav = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const menuItems = [
-    { title: "Home", href: "/" },
-    { title: "About", href: "/about" },
-    { title: "Services", href: "/services" },
-    { title: "Contact", href: "/contact" },
+    { title: "Dashboard", href: "/dashboard" },
+    { title: "Workout", href: "/workout" },
   ];
 
   const NavigationMenuDemo = () => (
