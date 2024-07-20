@@ -7,7 +7,16 @@ export type UserDb = {
     joined_date: string | undefined;
     updated_date: string | undefined;
 }
-
+export type ExerciseDb = {
+    id: number | undefined,
+    user_id: string,
+    name: string,
+    variant: string,
+    body_part: string,
+    type: string,
+    created_date: string | undefined,
+    updated_date: string | undefined,
+}
 // Other stuff
 export type RoutineSettings = {
     upperPush: number,

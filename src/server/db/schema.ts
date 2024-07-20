@@ -1,5 +1,6 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import { ExerciseDb } from "./types";
 
 export const users = sqliteTable('users',
   {
@@ -14,8 +15,8 @@ export const users = sqliteTable('users',
 
 export const exercises = sqliteTable('exercises',
   {
-    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    user_id: text('user_id').notNull().primaryKey().references(() => users.user_id),
+    id: integer('id', { mode: 'number' }).notNull().primaryKey({ autoIncrement: true }),
+    user_id: text('user_id').notNull().references(() => users.user_id),
     name: text('name').notNull(),
     variant: text('variant'),
     body_part: text('body_part').notNull(),
@@ -27,9 +28,9 @@ export const exercises = sqliteTable('exercises',
 
 export const workouts = sqliteTable('workouts', 
   {
-    user_id: text('user_id').notNull().primaryKey().references(() => users.user_id),
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    exercises: text('exercises', { mode: 'json' }).$type<{ foo: string }>(), // TODO: finish this type
+    user_id: text('user_id').notNull().references(() => users.user_id),
+    exercises: text('exercises', { mode: 'json' }).$type<ExerciseDb[]>(),
     created_date: text('created_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }
