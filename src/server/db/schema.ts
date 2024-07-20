@@ -1,6 +1,6 @@
 import { sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
-import type { ExerciseDb } from "./types";
+import type { Exercise } from "./types";
 
 export const users = sqliteTable('users',
   {
@@ -26,21 +26,21 @@ export const exercises = sqliteTable('exercises',
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }, (table) => {
     return {
-      userIdIdx: index("user_id_idx").on(table.user_id)
+      user_id_exercises_idx: index("user_id_exercises_idx").on(table.user_id)
     }
   }
 )
 
 export const workouts = sqliteTable('workouts', 
   {
-    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    id: integer('id', { mode: 'number' }).notNull().primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.user_id),
-    exercises: text('exercises', { mode: 'json' }).$type<ExerciseDb[]>(),
+    exercises: text('exercises', { mode: 'json' }).$type<Exercise[]>(),
     created_date: text('created_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }, (table) => {
     return {
-      user_id_idx: index("user_id_idx").on(table.user_id)
+      user_id_workouts_idx: index("user_id_workouts_idx").on(table.user_id)
     }
   }
 )
@@ -48,12 +48,12 @@ export const workouts = sqliteTable('workouts',
 export const settings = sqliteTable('settings',
   {
     user_id: text('user_id').notNull().primaryKey().references(() => users.user_id),
-    upper_pull: integer('upper_pull'),
-    upper_push: integer('upper_push'),
-    lower: integer('lower'),
-    abs: integer('abs'),
-    sets: integer('sets'),
-    rest_duration: integer('rest_duration'),
+    upper_pull: integer('upper_pull').notNull(),
+    upper_push: integer('upper_push').notNull(),
+    lower: integer('lower').notNull(),
+    abs: integer('abs').notNull(),
+    sets: integer('sets').notNull(),
+    rest_duration: integer('rest_duration').notNull(),
     created_date: text('created_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }

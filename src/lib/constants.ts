@@ -1,17 +1,20 @@
-import type { ExerciseDb, RoutineSettings } from "~/server/db/types"
+import type { ExerciseDb, SettingsDb } from "~/server/db/types"
 
 export const APP_NAME = "11-11 Coach"
 export const SECOND = 1000
 export const MINUTE = SECOND * 60
 export const HOUR = MINUTE * 60
 export const DAY = HOUR * 24
-export const ROUTINE_SETTINGS: RoutineSettings = {
-    upperPull: 1,
-    upperPush: 1,
+export const SETTINGS: SettingsDb = {
+    user_id: "",
+    upper_pull: 1,
+    upper_push: 1,
     lower: 1,
     abs: 1,
     sets: 2,
-    restDuration: 3 * MINUTE,
+    rest_duration: 3 * MINUTE,
+    created_date: undefined,
+    updated_date: undefined
   };
 export const EXERCISES: ExerciseDb[] = [
   {"id":undefined,"user_id":"","name":"pull-up","variant":"standard","body_part":"upper","type":"pull","used":false,"created_date":undefined,"updated_date":undefined},

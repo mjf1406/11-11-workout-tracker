@@ -1,21 +1,21 @@
-import type { RoutineSettings, Routine, ExerciseDb } from "~/server/db/types";
+import type { SettingsDb, Routine, ExerciseDb } from "~/server/db/types";
 
-export function generateRoutine(settings: RoutineSettings, exercises: ExerciseDb[]): Routine {
+export function generateRoutine(settings: SettingsDb, exercises: ExerciseDb[]): Routine {
     const routine: Routine = {
-      upperPull: [],
-      upperPush: [],
+      upper_pull: [],
+      upper_push: [],
       lower: [],
       abs: [],
     };
   
-    routine.upperPull = selectNRandomElements(
+    routine.upper_pull = selectNRandomElements(
       exercises.filter(e => e.body_part === 'upper' && e.type === 'pull'),
-      settings.upperPull
+      settings.upper_pull
     );
   
-    routine.upperPush = selectNRandomElements(
+    routine.upper_push = selectNRandomElements(
       exercises.filter(e => e.body_part === 'upper' && e.type === 'push'),
-      settings.upperPush
+      settings.upper_push
     );
   
     routine.lower = selectNRandomElements(

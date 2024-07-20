@@ -1,4 +1,7 @@
-import { BicepsFlexed } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { BicepsFlexed, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -10,8 +13,40 @@ import {
   DialogFooter,
   DialogClose,
 } from "~/components/ui/dialog";
+import { saveWorkout } from "./actions";
+import { useRouter } from "next/navigation";
+import { toast } from "~/components/ui/use-toast";
+import type { Workout } from "~/server/db/types";
 
-export default function FinishWorkout() {
+interface FinishWorkoutProps {
+  workout: Workout;
+}
+
+export default function FinishWorkout({ workout }: FinishWorkoutProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleFinishWorkout = async () => {
+    setIsLoading(true);
+    try {
+      const savedWorkout = await saveWorkout(workout);
+      toast({
+        title: "Workout saved",
+        description: "Your workout has been successfully saved.",
+      });
+      router.push("/workouts"); // Redirect to workouts page or wherever you want
+    } catch (error) {
+      console.error("Failed to save workout:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save workout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -22,8 +57,10 @@ export default function FinishWorkout() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
-          <DialogDescription>This action cannot be undone.</DialogDescription>
+          <DialogTitle>Finish Workout</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to finish and save this workout?
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
@@ -31,19 +68,20 @@ export default function FinishWorkout() {
               Cancel
             </Button>
           </DialogClose>
-          <DialogFooter>
-            {/* {loading ? (
-                <Button disabled>
-                  <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                  Creating...
-                </Button>
-              ) : (
-                <Button type="submit" onClick={handleCreateClass}>
-                  Create class
-                </Button>
-              )} */}
-            <Button variant={"default"}>Finish workout</Button>
-          </DialogFooter>
+          <Button
+            variant="default"
+            onClick={handleFinishWorkout}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Finish workout"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

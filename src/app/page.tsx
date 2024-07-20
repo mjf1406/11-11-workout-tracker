@@ -22,7 +22,7 @@ export default function HomePage() {
           <div className="max-w-lg text-center text-xl tracking-tight md:text-2xl">
             Say goodbye to workout planning! With our randomized 11-11 workouts,
             you&apos;ll get a fresh set of exercises every day. Just focus on
-            your fitness while we ensure you never repeat the same routine
+            giving 100% and we&apos;ll ensure you never repeat the same routine
             (within reason).
           </div>
           <div className="flex gap-5">

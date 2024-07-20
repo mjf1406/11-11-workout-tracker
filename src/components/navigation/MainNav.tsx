@@ -21,6 +21,7 @@ const MainNav = () => {
   const menuItems = [
     { title: "Dashboard", href: "/dashboard" },
     { title: "Exercises", href: "/exercises" },
+    { title: "Settings", href: "/settings" },
     { title: "Workout", href: "/workout" },
   ];
 
