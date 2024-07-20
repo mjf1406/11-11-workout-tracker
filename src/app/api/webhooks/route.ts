@@ -3,7 +3,7 @@
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { type WebhookEvent } from '@clerk/nextjs/server'
-import insertUser from './insertUser';
+import insertUser, { insertNewUserExercises } from './actions';
 
 interface UserCreatedEventData {
   id: string;
@@ -73,6 +73,7 @@ export async function POST(req: Request) {
       const userId = data.id;
       if (userId) { 
         await insertUser(userId)
+        await insertNewUserExercises(userId)
       }
     } else {
       console.error('Unexpected event data format for user.created:', data);

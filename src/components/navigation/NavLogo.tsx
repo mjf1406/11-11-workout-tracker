@@ -8,7 +8,7 @@ export default function NavLogo() {
       <Logo fill="hsl(var(--primary))" size="30" />
       <div className="hidden flex-row gap-1 text-2xl md:flex">
         <div>{APP_NAME}</div>
-        <div className="text-top justify-start self-start text-xs">[BETA]</div>
+        <div className="text-top justify-start self-start text-xs">[ALPHA]</div>
       </div>
     </Link>
   );

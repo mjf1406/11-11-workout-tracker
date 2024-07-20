@@ -13,7 +13,7 @@ import { Button } from "~/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 import { Menu } from "lucide-react";
 import UserAndTheme from "./UserAndTheme";
-import NavLogo from "./NavLogo.";
+import NavLogo from "./NavLogo";
 
 const MainNav = () => {
   const [isOpen, setIsOpen] = React.useState(false);

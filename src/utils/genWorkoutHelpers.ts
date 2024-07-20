@@ -1,6 +1,6 @@
-import type { Exercise, RoutineSettings, Routine } from "~/server/db/types";
+import type { RoutineSettings, Routine, ExerciseDb } from "~/server/db/types";
 
-export function generateRoutine(settings: RoutineSettings, exercises: Exercise[]): Routine {
+export function generateRoutine(settings: RoutineSettings, exercises: ExerciseDb[]): Routine {
     const routine: Routine = {
       upperPull: [],
       upperPush: [],
@@ -9,22 +9,22 @@ export function generateRoutine(settings: RoutineSettings, exercises: Exercise[]
     };
   
     routine.upperPull = selectNRandomElements(
-      exercises.filter(e => e.BODY_PART === 'upper' && e.TYPE === 'pull'),
+      exercises.filter(e => e.body_part === 'upper' && e.type === 'pull'),
       settings.upperPull
     );
   
     routine.upperPush = selectNRandomElements(
-      exercises.filter(e => e.BODY_PART === 'upper' && e.TYPE === 'push'),
+      exercises.filter(e => e.body_part === 'upper' && e.type === 'push'),
       settings.upperPush
     );
   
     routine.lower = selectNRandomElements(
-      exercises.filter(e => e.BODY_PART === 'lower'),
+      exercises.filter(e => e.body_part === 'lower'),
       settings.lower
     );
   
     routine.abs = selectNRandomElements(
-      exercises.filter(e => e.BODY_PART === 'abs'),
+      exercises.filter(e => e.body_part === 'abs'),
       settings.abs
     );
   
@@ -47,11 +47,10 @@ function getRandomElement<T>(arr: T[]): T | undefined {
     return arr[randomIndex];
 }
 
-function shuffleArray<T>(array: T[]): T[] {
+export async function shuffleArray<T>(array: T[]): Promise<T[]> {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    // Use a type assertion to tell TypeScript that these values are definitely of type T
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]] as [T, T];
   }
   return shuffled;

@@ -14,6 +14,7 @@ export type ExerciseDb = {
     variant: string,
     body_part: string,
     type: string,
+    used: boolean,
     created_date: string | undefined,
     updated_date: string | undefined,
 }
@@ -28,16 +29,16 @@ export type RoutineSettings = {
 }
 
 export type Exercise = {
-    ID: number,
-    NAME: string,
-    VARIANT: string,
-    BODY_PART: string,
-    TYPE: string,
+    id: number,
+    name: string,
+    variant: string,
+    body_part: string,
+    type: string,
 }
 
 export type Routine = {
-    upperPull: Exercise[],
-    upperPush: Exercise[],
-    lower: Exercise[],
-    abs: Exercise[],
+    upperPull: ExerciseDb[],
+    upperPush: ExerciseDb[],
+    lower: ExerciseDb[],
+    abs: ExerciseDb[],
 }
