@@ -26,21 +26,23 @@ const MainNav = () => {
   ];
 
   const NavigationMenuDemo = () => (
-    <NavigationMenu>
-      <NavigationMenuList className="space-x-4">
-        {menuItems.map((item) => (
-          <NavigationMenuItem key={item.title}>
-            <NavigationMenuLink
-              href={item.href}
-              className="rounded-xl px-2 py-1.5 hover:bg-secondary"
-            >
-              {item.title}
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        ))}
-        <UserAndTheme />
-      </NavigationMenuList>
-    </NavigationMenu>
+    <>
+      <NavigationMenu>
+        <NavigationMenuList className="space-x-4">
+          {menuItems.map((item) => (
+            <NavigationMenuItem key={item.title}>
+              <NavigationMenuLink
+                href={item.href}
+                className="rounded-xl px-2 py-1.5 hover:bg-secondary"
+              >
+                {item.title}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
+          <UserAndTheme />
+        </NavigationMenuList>
+      </NavigationMenu>
+    </>
   );
 
   return (
@@ -64,6 +66,9 @@ const MainNav = () => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
+                <div className="mb-3 flex items-start">
+                  <UserAndTheme />
+                </div>
                 <nav className="flex flex-col space-y-4">
                   {menuItems.map((item) => (
                     <a

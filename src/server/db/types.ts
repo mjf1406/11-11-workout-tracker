@@ -51,3 +51,22 @@ export type Routine = {
     lower: ExerciseDb[],
     abs: ExerciseDb[],
 }
+export type ExerciseRoutine = {
+    id: number | undefined,
+    user_id: string,
+    name: string,
+    variant: string,
+    body_part: string,
+    type: string,
+    used: boolean,
+    created_date: string | undefined,
+    updated_date: string | undefined,
+    previous_weight: number | undefined,
+    previous_reps: number | undefined
+}
+export type RoutineClient = {
+    upper_pull: ExerciseRoutine[],
+    upper_push: ExerciseRoutine[],
+    lower: ExerciseRoutine[],
+    abs: ExerciseRoutine[],
+}
