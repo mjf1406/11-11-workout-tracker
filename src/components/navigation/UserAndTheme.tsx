@@ -25,7 +25,7 @@ export default function UserAndTheme() {
 
   return (
     <>
-      <div className="flex items-center justify-end gap-4">
+      <div className="flex min-w-24 items-center justify-end gap-4">
         {!isSignedIn ? (
           <SignedOut>
             <div>

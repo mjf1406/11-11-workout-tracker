@@ -10,7 +10,6 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 - UI: we have a new color scheme!
 - added: the tidbits of advice are now randomized on the `workout-complete` page
 - optimized: rendering of `workout` no longer has the strange content shift
-- optimized: `MainNav` no longer has the weird content shift
 
 ### p0
 
@@ -26,6 +25,7 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 2024/07/25
 
+- optimized: `MainNav` no longer has the weird content shift. Set `UserAndTheme.tsx` to have a min-w-24
 - meta: updated the site description
 - meta: updated the site title
 - meta: updated the favicon
