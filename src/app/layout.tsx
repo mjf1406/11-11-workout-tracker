@@ -7,8 +7,7 @@ import { APP_NAME } from "~/lib/constants";
 
 export const metadata = {
   title: APP_NAME,
-  description:
-    "Reduce the amount of time and tedium on making your report cards.",
+  description: "Random 11-11 workouts offloads routine planning",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
