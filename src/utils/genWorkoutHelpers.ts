@@ -1,75 +1,128 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 import { getPreviousExerciseSetDataById, setExerciseUsedById } from "~/app/exercises/actions";
-import type { SettingsDb, Routine, ExerciseDb, Workout, RoutineClient, ExerciseRoutine } from "~/server/db/types";
+import type { SettingsDb, Routine, ExerciseDb, Workout, RoutineClient, ExerciseRoutine, DayOfWeek } from "~/server/db/types";
 
-export async function generateRoutine(settings: SettingsDb, exercises: ExerciseDb[]): Promise<Routine> {
-    const routine: Routine = {
-      upper_pull: [],
-      upper_push: [],
-      lower: [],
-      abs: [],
-    };
-  
-    let upperPull = exercises.filter(e => e.body_part === 'upper' && e.type === 'pull')
-    let upperPush = exercises.filter(e => e.body_part === 'upper' && e.type === 'push')
-    let lower = exercises.filter(e => e.body_part === 'lower')
-    let abs = exercises.filter(e => e.body_part === 'abs')
+type BodyPart = 'upper' | 'lower' | 'abs';
+type ExerciseType = 'push' | 'pull' | '-';
 
-    upperPull = await handleUsedCheck(upperPull, "upper_pull", settings)
-    upperPush = await handleUsedCheck(upperPush, "upper_push", settings)
-    lower = await handleUsedCheck(lower, "lower", settings)
-    abs = await handleUsedCheck(abs, "abs", settings)
+interface FilterCriteria {
+  bodyPart: BodyPart;
+  type?: ExerciseType;
+  forcedDaysOnly?: boolean;
+  forcedDay?: DayOfWeek;
+}
 
-    upperPull = upperPull.filter(e => e.used === false)
-    upperPush = upperPush.filter(e => e.used === false)
-    lower = lower.filter(e => e.used === false)
-    abs = abs.filter(e => e.used === false)
+const filterExercises = (
+  exercises: ExerciseDb[], 
+  criteria: FilterCriteria
+): ExerciseDb[] => {
+  return exercises.filter(exercise => {
+    const bodyPartMatch = exercise.body_part === criteria.bodyPart;
+    const typeMatch = !criteria.type || exercise.type === criteria.type;
+    
+    let forcedDaysMatch = true;
+    if (criteria.forcedDaysOnly !== undefined || criteria.forcedDay) {
+      const forcedDays = exercise.forced_days;
+      
+      if (criteria.forcedDay) {
+        forcedDaysMatch = forcedDays[criteria.forcedDay];
+      } else if (criteria.forcedDaysOnly !== undefined) {
+        const hasForcedDays = Object.values(forcedDays).some(day => day === true);
+        forcedDaysMatch = criteria.forcedDaysOnly ? hasForcedDays : !hasForcedDays;
+      }
+    }
 
-    routine.upper_pull = selectNRandomElements(
-      upperPull,
-      settings.upper_pull
-    );
-  
-    routine.upper_push = selectNRandomElements(
-      upperPush,
-      settings.upper_push
-    );
-  
-    routine.lower = selectNRandomElements(
-      lower,
-      settings.lower
-    );
-  
-    routine.abs = selectNRandomElements(
-      abs,
-      settings.abs
-    );
-  
-    for (const category in routine) {
-      if (routine.hasOwnProperty(category)) {
-        for (const exercise of routine[category as keyof Routine]) {
-          const id = exercise.id
-          if (!id) continue
-          const exerciseData: Workout[] = await getPreviousExerciseSetDataById(id);
-          const dataZero = exerciseData[0]?.exercises
-          const data = dataZero?.find(e => e.id === id)
-          const sets = data?.sets[0]
-          const routineExercises = routine[category as keyof Routine]
-          const routineExerciseIndex = routineExercises.findIndex(e => e.id === exercise.id)
-          if (!routine[category as keyof Routine] || routineExerciseIndex === -1) continue;
-          const exerciseArray = routine[category as keyof Routine];
-          if (Array.isArray(exerciseArray) && routineExerciseIndex in exerciseArray) {
-            const currentExercise = exerciseArray[routineExerciseIndex];
-            if (currentExercise) {
-              (currentExercise as ExerciseRoutine).previous_weight = sets?.weight;
-              (currentExercise as ExerciseRoutine).previous_reps = sets?.reps;
-            }
+    return bodyPartMatch && typeMatch && forcedDaysMatch;
+  });
+};
+
+const getCurrentDayOfWeek = (): DayOfWeek => {
+  const days: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const currentDay = new Date().getDay();
+  return days[currentDay]!;
+};
+
+export async function generateRoutine(settings: SettingsDb, exercises: ExerciseDb[]): Promise<RoutineClient> {
+
+  const currentDay: DayOfWeek = getCurrentDayOfWeek();
+
+  const routine: Routine = {
+    upper_pull: [],
+    upper_push: [],
+    lower: [],
+    abs: [],
+  };
+
+  const upperPullForced = filterExercises(exercises, { bodyPart: 'upper', type: 'pull', forcedDay: currentDay})
+  const upperPushForced = filterExercises(exercises, { bodyPart: 'upper', type: 'push', forcedDay: currentDay})
+  const lowerForced = filterExercises(exercises, { bodyPart: 'lower', forcedDay: currentDay})
+  const absForced = filterExercises(exercises, { bodyPart: 'abs', forcedDay: currentDay})
+
+  let upperPull = filterExercises(exercises, { bodyPart: 'upper', forcedDaysOnly: false, type: 'pull' });
+  let upperPush = filterExercises(exercises, { bodyPart: 'upper', forcedDaysOnly: false, type: 'push' });
+  let lower = filterExercises(exercises, { bodyPart: 'lower', forcedDaysOnly: false });
+  let abs = filterExercises(exercises, { bodyPart: 'abs', forcedDaysOnly: false });
+
+  upperPull = await handleUsedCheck(upperPull, "upper_pull", settings)
+  upperPush = await handleUsedCheck(upperPush, "upper_push", settings)
+  lower = await handleUsedCheck(lower, "lower", settings)
+  abs = await handleUsedCheck(abs, "abs", settings)
+
+  upperPull = upperPull.filter(e => e.used === false)
+  upperPush = upperPush.filter(e => e.used === false)
+  lower = lower.filter(e => e.used === false)
+  abs = abs.filter(e => e.used === false)
+
+  routine.upper_pull = selectNRandomElements(
+    upperPull,
+    settings.upper_pull
+  );
+
+  routine.upper_push = selectNRandomElements(
+    upperPush,
+    settings.upper_push
+  );
+
+  routine.lower = selectNRandomElements(
+    lower,
+    settings.lower
+  );
+
+  routine.abs = selectNRandomElements(
+    abs,
+    settings.abs
+  );
+
+  routine.upper_pull = [...routine.upper_pull, ...upperPullForced];
+  routine.upper_push = [...routine.upper_push, ...upperPushForced];
+  routine.lower = [...routine.lower, ...lowerForced];
+  routine.abs = [...routine.abs, ...absForced];
+
+  for (const category in routine) {
+    if (routine.hasOwnProperty(category)) {
+      for (const exercise of routine[category as keyof Routine]) {
+        const id = exercise.id
+        if (!id) continue
+        const exerciseData: Workout[] = await getPreviousExerciseSetDataById(id);
+        const dataZero = exerciseData[0]?.exercises
+        const data = dataZero?.find(e => e.id === id)
+        const sets = data?.sets[0]
+        const routineExercises = routine[category as keyof Routine]
+        const routineExerciseIndex = routineExercises.findIndex(e => e.id === exercise.id)
+        if (!routine[category as keyof Routine] || routineExerciseIndex === -1) continue;
+        const exerciseArray = routine[category as keyof Routine];
+        if (Array.isArray(exerciseArray) && routineExerciseIndex in exerciseArray) {
+          const currentExercise = exerciseArray[routineExerciseIndex];
+          if (currentExercise) {
+            (currentExercise as ExerciseRoutine).previous_weight = sets?.weight;
+            (currentExercise as ExerciseRoutine).previous_reps = sets?.reps;
           }
         }
       }
     }
+  }
 
-    return routine as RoutineClient;
+  return routine as RoutineClient;
 }
 
 type ExerciseCategory = 'upper_pull' | 'upper_push' | 'lower' | 'abs';

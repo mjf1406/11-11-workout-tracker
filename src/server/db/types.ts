@@ -1,4 +1,7 @@
+
 // Database
+export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sun" | "sat"
+
 export type SettingsDb = {
     user_id: string,
     upper_pull: number,
@@ -26,6 +29,8 @@ export type ExerciseDb = {
     body_part: string,
     type: string,
     used: boolean,
+    unit: "reps" | "stopwatch",
+    forced_days: Days,
     created_date: string | undefined,
     updated_date: string | undefined,
 }
@@ -59,6 +64,8 @@ export type ExerciseRoutine = {
     body_part: string,
     type: string,
     used: boolean,
+    unit: "reps" | "stopwatch",
+    forced_days: Days,
     created_date: string | undefined,
     updated_date: string | undefined,
     previous_weight: number | undefined,
@@ -69,4 +76,13 @@ export type RoutineClient = {
     upper_push: ExerciseRoutine[],
     lower: ExerciseRoutine[],
     abs: ExerciseRoutine[],
+}
+export type Days = {
+  mon: boolean,
+  tue: boolean,
+  wed: boolean,
+  thu: boolean,
+  fri: boolean,
+  sat: boolean,
+  sun: boolean
 }

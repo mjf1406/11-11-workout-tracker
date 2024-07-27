@@ -4,24 +4,33 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ## To-do List
 
+### p2
+
+- optimized: rendering of `workout` no longer has the strange content shift
+- UX: exercises page is no longer reloaded when deleting an exercise
+- UX: exercise page is no longer reloaded when creating a new exercise
+
 ### p1
 
 - UI: we have a new logo!
 - UI: we have a new color scheme!
 - added: the tidbits of advice are now randomized on the `workout-complete` page
-- optimized: rendering of `workout` no longer has the strange content shift
 
 ### p0
 
 - added: dashboard page is no longer under construction
-- UX: exercises page is no longer reloaded when deleting an exercise
-- UX: exercise page is no longer reloaded when creating a new exercise
-- UX: when completing a set in the last exercise of the routine, the timer automatically starts
 - added: an exercise can now be edited on the exercises page
-- feature: can set an exercise to always be included, or only include on certain days you generate a routine
-- feature: added support for stopwatch exercises instead of weight when adding an exercise. This needs to render a different column header on the `/workout`
 
 ## Change Log
+
+2024/07/27
+
+- UI: updated the exercises table to account for the two new columns: unit and forced_days
+- UX: when clicking into stopwatch inputs, a stopwatch is started in a `Drawer.tsx` which has a stop button that automatically sets the time when clicked in the appropriate input
+- UX: when completing a set in the last exercise of the routine, the rest timer starts automatically in a `Drawer.tsx`
+- feature: can set an exercise to always be included, or only include on certain days you generate a routine
+- backend: added the unit and forced_days columns in preparation for supporting stopwatch or timer exercises and exercises that are forcibly added to the workout as an extra exercise.
+- backend: filtered out exercises that are forced when randomly picking exercises
 
 2024/07/25
 

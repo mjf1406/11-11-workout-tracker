@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Loader2, BicepsFlexed } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MainNav from "~/components/navigation/MainNav";
@@ -17,6 +17,16 @@ import {
   DialogFooter,
   DialogClose,
 } from "~/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "~/components/ui/drawer";
+
 import { toast } from "~/components/ui/use-toast";
 import type {
   ExerciseRoutine,
@@ -43,22 +53,51 @@ interface WorkoutData extends Omit<WorkoutType, "exercises"> {
   exercises: ExerciseData[];
 }
 
+const MemoizedMainNav = React.memo(MainNav);
+
+const isLastExercise = (
+  exerciseId: number,
+  routine?: ExerciseRoutine[],
+): boolean => {
+  if (!routine || routine.length === 0) {
+    return false;
+  }
+
+  const lastExercise = routine[routine.length - 1];
+  if (lastExercise) {
+    return exerciseId === lastExercise.id;
+  }
+
+  return false;
+};
+
 export default function Workout() {
   const [routine, setRoutine] = useState<ExerciseRoutine[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [workout, setWorkout] = useState<WorkoutData | null>(null);
   const [isFinishLoading, setIsFinishLoading] = useState(false);
+  const [isResting, setIsResting] = useState(false);
+  const [restTimer, setRestTimer] = useState(90);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [settings, setSettings] = useState<SettingsDb>();
+  const [isStopwatchDrawerOpen, setIsStopwatchDrawerOpen] = useState(false);
+  const [stopwatchTime, setStopwatchTime] = useState(0);
+  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+  const [activeSetIndex, setActiveSetIndex] = useState<number | null>(null);
+  const stopwatchRef = useRef<NodeJS.Timeout | null>(null);
+  const [activeExerciseName, setActiveExerciseName] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
     const fetchRoutine = async () => {
       try {
         const routine: ExerciseRoutine[] = await handleGenerateRoutine();
-        console.log("🚀 ~ fetchRoutine ~ routine:", routine);
         setRoutine(routine);
 
         const settingsArray: SettingsDb[] = await getSettings();
         const settings: SettingsDb | undefined = settingsArray[0];
+        setSettings(settings);
         if (!settings) return;
 
         setWorkout({
@@ -85,6 +124,85 @@ export default function Workout() {
     void fetchRoutine();
   }, []);
 
+  useEffect(() => {
+    if (isStopwatchDrawerOpen) {
+      stopwatchRef.current = setInterval(() => {
+        setStopwatchTime((prev) => prev + 100);
+      }, 100);
+    } else {
+      if (stopwatchRef.current) {
+        clearInterval(stopwatchRef.current);
+      }
+      setStopwatchTime(0);
+    }
+
+    return () => {
+      if (stopwatchRef.current) {
+        clearInterval(stopwatchRef.current);
+      }
+    };
+  }, [isStopwatchDrawerOpen]);
+
+  const handleStopwatchStart = (
+    exerciseId: number,
+    setIndex: number,
+    exerciseName: string,
+  ) => {
+    setActiveExerciseId(exerciseId);
+    setActiveSetIndex(setIndex);
+    setActiveExerciseName(exerciseName);
+    setIsStopwatchDrawerOpen(true);
+  };
+
+  const handleStopwatchStop = () => {
+    if (activeExerciseId !== null && activeSetIndex !== null) {
+      updateSet(activeExerciseId, activeSetIndex, { reps: stopwatchTime });
+    }
+    setIsStopwatchDrawerOpen(false);
+    setActiveExerciseId(null);
+    setActiveSetIndex(null);
+  };
+
+  useEffect(() => {
+    if (isResting && restTimer > 0) {
+      timerRef.current = setInterval(() => {
+        setRestTimer((prev) => Math.max(0, prev - 100));
+      }, 100);
+    } else if (restTimer === 0) {
+      setIsResting(false);
+      setIsDrawerOpen(false);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isResting, restTimer]);
+
+  const startRestTimer = () => {
+    setIsResting(true);
+    setRestTimer(settings?.rest_duration ?? 90000);
+    setIsDrawerOpen(true);
+  };
+
+  const adjustRestTimer = (milliseconds: number) => {
+    setRestTimer((prev) => Math.max(0, prev + milliseconds));
+  };
+
+  const skipRestTimer = () => {
+    setIsResting(false);
+    setRestTimer(0);
+    setIsDrawerOpen(false);
+  };
+
+  const formatTime = (milliseconds: number) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   const isSetCompleted = (exerciseId: number, setIndex: number): boolean => {
     return !!workout?.exercises.find((e) => e.id === exerciseId)?.sets[setIndex]
       ?.isCompleted;
@@ -97,7 +215,8 @@ export default function Workout() {
   ) => {
     setWorkout((prevWorkout) => {
       if (!prevWorkout) return null;
-      return {
+
+      const updatedWorkout = {
         ...prevWorkout,
         exercises: prevWorkout.exercises.map((exercise) =>
           exercise.id === exerciseId
@@ -110,6 +229,15 @@ export default function Workout() {
             : exercise,
         ),
       };
+
+      const lastExercise = isLastExercise(exerciseId, routine);
+      const setJustCompleted = updateData.isCompleted === true;
+
+      if (lastExercise && setJustCompleted) {
+        startRestTimer();
+      }
+
+      return updatedWorkout;
     });
   };
 
@@ -181,8 +309,8 @@ export default function Workout() {
 
   return (
     <>
-      <MainNav />
-      <main className="flex flex-col items-center justify-center gap-8 bg-background p-5 text-foreground">
+      <MemoizedMainNav />
+      <main className="flex flex-col items-center justify-center gap-8 bg-background p-5 pb-20 text-foreground">
         <h1 className="text-4xl">Workout</h1>
         <div className="m-auto mb-16 flex w-full flex-col items-center justify-center md:max-w-[500px]">
           {isLoading ? (
@@ -210,7 +338,9 @@ export default function Workout() {
                       <div className="col-span-1 text-center">SET</div>
                       <div className="col-span-1 text-center">PREV.</div>
                       <div className="col-span-2 text-center">+WEIGHT</div>
-                      <div className="col-span-2 text-center">REPS</div>
+                      <div className="col-span-2 text-center">
+                        {exercise.unit.toUpperCase()}
+                      </div>
                       <div className="col-span-1 text-center text-lg">✓</div>
                     </div>
                     {workout?.exercises
@@ -247,19 +377,38 @@ export default function Workout() {
                             />
                           </div>
                           <div className="col-span-2 text-center">
-                            <Input
-                              type="number"
-                              min="0"
-                              step="1"
-                              placeholder="Reps"
-                              defaultValue={exercise.previous_reps}
-                              onChange={(e) =>
-                                updateSet(exercise.id!, setIndex, {
-                                  reps: Number(e.target.value),
-                                })
-                              }
-                              className="text-center"
-                            />
+                            {exercise.unit === "stopwatch" ? (
+                              <Button
+                                className="m-auto w-full"
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleStopwatchStart(
+                                    exercise.id!,
+                                    setIndex,
+                                    `${exercise.name.titleCase()}, ${exercise.variant}`,
+                                  )
+                                }
+                              >
+                                {set.reps ? formatTime(set.reps) : "Start"}
+                              </Button>
+                            ) : (
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                placeholder={
+                                  exercise.unit === "reps" ? "Reps" : "Time"
+                                }
+                                defaultValue={exercise.previous_reps}
+                                onChange={(e) =>
+                                  updateSet(exercise.id!, setIndex, {
+                                    reps: Number(e.target.value),
+                                  })
+                                }
+                                className="text-center"
+                              />
+                            )}
                           </div>
                           <div className="col-span-1 flex justify-center">
                             <Checkbox
@@ -323,6 +472,66 @@ export default function Workout() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          {/* Timer Drawer */}
+          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <DrawerTrigger asChild>
+              {isResting ? (
+                <Button variant="outline">
+                  Resting for {formatTime(restTimer)}
+                </Button>
+              ) : (
+                <></>
+              )}
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Rest timer</DrawerTitle>
+                <DrawerDescription className="text-center text-9xl">
+                  {formatTime(restTimer)}
+                </DrawerDescription>
+              </DrawerHeader>
+              <DrawerFooter>
+                <div className="m-auto flex w-full flex-grow flex-row items-center justify-center gap-5">
+                  <Button
+                    variant={"ghost"}
+                    className="font-bold text-primary/80"
+                    onClick={() => adjustRestTimer(-30000)}
+                  >
+                    -30 sec.
+                  </Button>
+                  <Button
+                    variant={"ghost"}
+                    className="font-bold text-primary/80"
+                    onClick={() => adjustRestTimer(30000)}
+                  >
+                    +30 sec.
+                  </Button>
+                  <Button className="min-w-44" onClick={skipRestTimer}>
+                    Skip
+                  </Button>
+                </div>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+          {/* Stopwatch Drawer */}
+          <Drawer
+            open={isStopwatchDrawerOpen}
+            onOpenChange={setIsStopwatchDrawerOpen}
+          >
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>{activeExerciseName}</DrawerTitle>
+                <DrawerDescription className="text-center text-9xl">
+                  {formatTime(stopwatchTime)}
+                </DrawerDescription>
+              </DrawerHeader>
+              <DrawerFooter className="flex flex-row items-center justify-center">
+                <Button onClick={handleStopwatchStop} className="w-36">
+                  Done
+                </Button>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         </div>
       </main>
     </>

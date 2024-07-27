@@ -1,6 +1,6 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
-import type { Exercise } from "./types";
+import type { Days, Exercise } from "./types";
 
 export const users = sqliteTable('users',
   {
@@ -22,6 +22,8 @@ export const exercises = sqliteTable('exercises',
     body_part: text('body_part').notNull(),
     type: text('type'),
     used: integer('used', { mode: 'boolean' }),
+    unit: text('unit', { enum: ["reps", "stopwatch"] }),
+    forced_days: text('forced_days', { mode: 'json' }).$type<Days>(), // Days of the week on which the exercise is always included as an extra exercise
     created_date: text('created_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }, (table) => {

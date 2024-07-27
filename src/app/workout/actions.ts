@@ -4,7 +4,7 @@ import { db } from "~/server/db/index";
 import { auth } from "@clerk/nextjs/server";
 import { getExercisesByUserId, setExerciseUsedById } from "../exercises/actions";
 import { generateRoutine, shuffleArray } from "~/utils/genWorkoutHelpers";
-import type { ExerciseRoutine, SettingsDb, Workout } from "~/server/db/types";
+import type { ExerciseDb, ExerciseRoutine, SettingsDb, Workout } from "~/server/db/types";
 import { workouts as workoutsTable } from "~/server/db/schema";
 import { getSettings } from "../settings/actions";
 import { eq, desc } from "drizzle-orm";
@@ -15,7 +15,7 @@ export async function handleGenerateRoutine(): Promise<ExerciseRoutine[]> {
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated")
 
-    const userExercises: ExerciseRoutine[] = await getExercisesByUserId(userId)
+    const userExercises: ExerciseDb[] = await getExercisesByUserId(userId)
     const userSettings = await getSettings()
     const settings: SettingsDb | undefined = userSettings[0]
     if(!settings) throw new Error("Settings is undefined")
@@ -27,7 +27,7 @@ export async function handleGenerateRoutine(): Promise<ExerciseRoutine[]> {
       ...generatedRoutine.abs,
     ];
     const routine = await shuffleArray(allExercises)
-    return routine as ExerciseRoutine[]
+    return routine
 }
 
 export async function saveWorkout(workout: Workout) {

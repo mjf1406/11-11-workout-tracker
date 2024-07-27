@@ -12,10 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Checkbox } from "~/components/ui/checkbox";
-import type { ExerciseDb } from "~/server/db/types";
 import { deleteExercise } from "./actions";
+import type { Exercises } from "./page";
 
-export const columns: ColumnDef<ExerciseDb>[] = [
+export const columns: ColumnDef<Exercises>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -95,10 +95,38 @@ export const columns: ColumnDef<ExerciseDb>[] = [
     },
   },
   {
+    accessorKey: "unit",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Unit
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "forced_days",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Forced Days
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const exercise: ExerciseDb = row.original;
+      const exercise: Exercises = row.original;
 
       return (
         <DropdownMenu>
@@ -122,9 +150,9 @@ export const columns: ColumnDef<ExerciseDb>[] = [
             <DropdownMenuItem>
               <Edit className="mr-2" /> Edit exercise
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View exercise details</DropdownMenuItem>
+            <DropdownMenuItem>View exercise details</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       );
