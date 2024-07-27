@@ -105,11 +105,17 @@ export default function Workout() {
           user_id: "",
           exercises: routine.map((exercise) => ({
             id: exercise.id!,
-            sets: Array(settings.sets).fill({
-              weight: 0,
-              reps: 0,
-              isCompleted: false,
-            }),
+            sets: exercise.sets
+              ? exercise.sets.map((set) => ({
+                  weight: set.weight,
+                  reps: set.reps,
+                  isCompleted: false,
+                }))
+              : Array(settings.sets).fill({
+                  weight: 0,
+                  reps: 0,
+                  isCompleted: false,
+                }),
           })),
           created_date: undefined,
           updated_date: undefined,
@@ -164,9 +170,29 @@ export default function Workout() {
   };
 
   useEffect(() => {
+    const timerPop = new Audio(
+      "https://utfs.io/f/996d6ea5-8313-4d9e-8826-5e4bbf7cbb81-vwnkn.ogg",
+    );
+    const timerEnd = new Audio(
+      "https://utfs.io/f/23579237-c9ce-4d4f-bb2f-528d9a93b773-vwfdt.ogg",
+    );
     if (isResting && restTimer > 0) {
       timerRef.current = setInterval(() => {
-        setRestTimer((prev) => Math.max(0, prev - 100));
+        setRestTimer((prev) => {
+          const newTime = Math.max(0, prev - 100);
+
+          // Play pop sound at 3, 2, and 1 seconds
+          if ([4000, 3000, 2000].includes(newTime)) {
+            void timerPop.play();
+          }
+
+          // Play end sound at 0 seconds
+          if (newTime === 1000) {
+            void timerEnd.play();
+          }
+
+          return newTime;
+        });
       }, 100);
     } else if (restTimer === 0) {
       setIsResting(false);
@@ -196,7 +222,8 @@ export default function Workout() {
     setIsDrawerOpen(false);
   };
 
-  const formatTime = (milliseconds: number) => {
+  const formatTime = (milliseconds: number | undefined) => {
+    if (!milliseconds) return undefined;
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -246,17 +273,16 @@ export default function Workout() {
       if (!prevWorkout) return null;
       return {
         ...prevWorkout,
-        exercises: prevWorkout.exercises.map((exercise) =>
-          exercise.id === exerciseId
-            ? {
-                ...exercise,
-                sets: [
-                  ...exercise.sets,
-                  { weight: 0, reps: 0, isCompleted: false },
-                ],
-              }
-            : exercise,
-        ),
+        exercises: prevWorkout.exercises.map((exercise) => {
+          if (exercise.id === exerciseId) {
+            const newSet = { weight: 0, reps: 0, isCompleted: false };
+            return {
+              ...exercise,
+              sets: [...exercise.sets, newSet],
+            };
+          }
+          return exercise;
+        }),
       };
     });
   };
@@ -358,8 +384,15 @@ export default function Workout() {
                             {setIndex + 1}
                           </div>
                           <div className="col-span-1 text-center">
-                            +{exercise.previous_weight} x{" "}
-                            {exercise.previous_reps}
+                            +
+                            {exercise.sets
+                              ? exercise.sets[setIndex]?.weight
+                              : ""}{" "}
+                            x{" "}
+                            {exercise.sets &&
+                              (exercise.unit === "stopwatch"
+                                ? formatTime(exercise.sets[setIndex]?.reps)
+                                : exercise.sets[setIndex]?.reps)}
                           </div>
                           <div className="col-span-2 text-center">
                             <Input
@@ -367,7 +400,11 @@ export default function Workout() {
                               min="0"
                               step="0.5"
                               placeholder="Weight"
-                              defaultValue={exercise.previous_weight}
+                              defaultValue={
+                                exercise.sets
+                                  ? exercise.sets[setIndex]?.weight
+                                  : ""
+                              }
                               onChange={(e) =>
                                 updateSet(exercise.id!, setIndex, {
                                   weight: Number(e.target.value),
@@ -400,7 +437,11 @@ export default function Workout() {
                                 placeholder={
                                   exercise.unit === "reps" ? "Reps" : "Time"
                                 }
-                                defaultValue={exercise.previous_reps}
+                                defaultValue={
+                                  exercise.sets
+                                    ? exercise.sets[setIndex]?.reps
+                                    : ""
+                                }
                                 onChange={(e) =>
                                   updateSet(exercise.id!, setIndex, {
                                     reps: Number(e.target.value),
@@ -492,6 +533,13 @@ export default function Workout() {
               </DrawerHeader>
               <DrawerFooter>
                 <div className="m-auto flex w-full flex-grow flex-row items-center justify-center gap-5">
+                  <Button
+                    variant={"ghost"}
+                    className="font-bold text-primary/80"
+                    onClick={() => adjustRestTimer(-10000)}
+                  >
+                    -10 sec.
+                  </Button>
                   <Button
                     variant={"ghost"}
                     className="font-bold text-primary/80"

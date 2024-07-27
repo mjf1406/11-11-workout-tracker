@@ -70,6 +70,7 @@ export type ExerciseRoutine = {
     updated_date: string | undefined,
     previous_weight: number | undefined,
     previous_reps: number | undefined
+    sets: undefined | Set[]
 }
 export type RoutineClient = {
     upper_pull: ExerciseRoutine[],

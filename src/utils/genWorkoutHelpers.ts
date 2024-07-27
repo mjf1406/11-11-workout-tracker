@@ -106,7 +106,8 @@ export async function generateRoutine(settings: SettingsDb, exercises: ExerciseD
         const exerciseData: Workout[] = await getPreviousExerciseSetDataById(id);
         const dataZero = exerciseData[0]?.exercises
         const data = dataZero?.find(e => e.id === id)
-        const sets = data?.sets[0]
+        // const sets = data?.sets[0]
+        const sets = data?.sets
         const routineExercises = routine[category as keyof Routine]
         const routineExerciseIndex = routineExercises.findIndex(e => e.id === exercise.id)
         if (!routine[category as keyof Routine] || routineExerciseIndex === -1) continue;
@@ -114,8 +115,11 @@ export async function generateRoutine(settings: SettingsDb, exercises: ExerciseD
         if (Array.isArray(exerciseArray) && routineExerciseIndex in exerciseArray) {
           const currentExercise = exerciseArray[routineExerciseIndex];
           if (currentExercise) {
-            (currentExercise as ExerciseRoutine).previous_weight = sets?.weight;
-            (currentExercise as ExerciseRoutine).previous_reps = sets?.reps;
+            if (sets) {
+              // (currentExercise as ExerciseRoutine).previous_weight = sets[0].weight;
+              // (currentExercise as ExerciseRoutine).previous_reps = sets[0].reps;
+              (currentExercise as ExerciseRoutine).sets = sets;
+            }
           }
         }
       }

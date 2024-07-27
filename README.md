@@ -23,6 +23,12 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ## Change Log
 
+2024/07/28
+
+- backend: the previous weight and reps now loads on a per-set basis, i.e. if set 1 had 0x12, but set 2 had 0x10, that would load correctly in the PREVIOUS column
+- fixed: add set button now functions for exercises that have previous data displayed
+- added: a sound now plays when the res timer ends and a short beep on 3, 2, and 1 second remaining
+
 2024/07/27
 
 - UI: updated the exercises table to account for the two new columns: unit and forced_days
