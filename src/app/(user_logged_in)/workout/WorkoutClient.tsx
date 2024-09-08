@@ -1,4 +1,3 @@
-// WorkoutClient.tsx
 "use client";
 
 import React, { useCallback, useState } from "react";
@@ -21,6 +20,7 @@ import type { FilteredWorkoutData } from "~/server/db/types";
 
 export default function WorkoutClient() {
   const [isRestDrawerOpen, setIsRestDrawerOpen] = useState(false);
+  const [activeExerciseName, setActiveExerciseName] = useState("");
 
   const { data: settings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ["settings"],
@@ -61,22 +61,30 @@ export default function WorkoutClient() {
     stopStopwatch,
   } = useStopwatch();
 
-  const [activeExerciseName, setActiveExerciseName] = React.useState("");
-
   React.useEffect(() => {
     if (settings && exercises && workouts) {
       void generateWorkoutRoutine();
     }
   }, [settings, exercises, workouts, generateWorkoutRoutine]);
 
-  const handleStopwatchStart = (
-    exerciseId: number,
-    setIndex: number,
-    exerciseName: string,
-  ) => {
-    setActiveExerciseName(exerciseName);
-    startStopwatch();
-  };
+  const handleStopwatchStart = useCallback(
+    (exerciseId: number, setIndex: number, exerciseName: string) => {
+      setActiveExerciseName(exerciseName);
+      startStopwatch();
+    },
+    [startStopwatch],
+  );
+
+  const handleStopwatchStop = useCallback(() => {
+    stopStopwatch();
+    // Here you can add any additional logic needed when the stopwatch stops
+  }, [stopStopwatch]);
+
+  const handleStopwatchClose = useCallback(() => {
+    // Reset stopwatch state without updating the set
+    stopStopwatch();
+    setActiveExerciseName("");
+  }, [stopStopwatch]);
 
   const handleSetCompleteWithRest = useCallback(
     (exerciseId: number, setIndex: number, isCompleted: boolean) => {
@@ -102,7 +110,6 @@ export default function WorkoutClient() {
 
   const handleFinishWorkout = async (): Promise<FilteredWorkoutData | null> => {
     if (workout) {
-      // Check if any sets have been marked as complete
       const hasCompletedSets = Object.values(completedSets).some((setArray) =>
         setArray.some(Boolean),
       );
@@ -117,7 +124,6 @@ export default function WorkoutClient() {
         return null;
       }
 
-      // Filter workout data to only include exercise IDs and sets
       const filteredWorkout = {
         exercises: workout.exercises.map((exercise) => ({
           id: exercise.id,
@@ -125,9 +131,9 @@ export default function WorkoutClient() {
         })),
       };
 
-      return filteredWorkout; // Return the filtered workout data
+      return filteredWorkout;
     }
-    return null; // Return null if there's no workout
+    return null;
   };
 
   if (
@@ -166,7 +172,8 @@ export default function WorkoutClient() {
       <StopwatchDrawer
         isRunning={isStopwatchRunning}
         time={stopwatchTime}
-        onStop={stopStopwatch}
+        onStop={handleStopwatchStop}
+        onClose={handleStopwatchClose}
         exerciseName={activeExerciseName}
       />
     </main>

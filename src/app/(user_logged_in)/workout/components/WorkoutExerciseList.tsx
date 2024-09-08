@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ExerciseComponent } from "./Exercise";
-import { StopwatchDrawer } from "./StopwatchDrawer";
 import type { Exercise, Workout } from "~/server/db/types";
 
 interface WorkoutData extends Omit<Workout, "exercises"> {
@@ -23,6 +22,11 @@ interface WorkoutExerciseListProps {
     setIndex: number,
     isCompleted: boolean,
   ) => void;
+  onStopwatchStart: (
+    exerciseId: number,
+    setIndex: number,
+    exerciseName: string,
+  ) => void;
 }
 
 export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
@@ -31,87 +35,14 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
   onUpdateSet,
   onAddSet,
   onSetComplete,
+  onStopwatchStart,
 }) => {
-  const [stopwatchState, setStopwatchState] = useState<{
-    isRunning: boolean;
-    exerciseId: number | null;
-    setIndex: number | null;
-    exerciseName: string;
-    startTime: number | null;
-    currentTime: number;
-  }>({
-    isRunning: false,
-    exerciseId: null,
-    setIndex: null,
-    exerciseName: "",
-    startTime: null,
-    currentTime: 0,
-  });
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (stopwatchState.isRunning && stopwatchState.startTime) {
-      interval = setInterval(() => {
-        setStopwatchState((prev) => ({
-          ...prev,
-          currentTime: Date.now() - prev.startTime!,
-        }));
-      }, 10);
-    }
-    return () => clearInterval(interval);
-  }, [stopwatchState.isRunning, stopwatchState.startTime]);
-
   const formatTime = (milliseconds: number | undefined) => {
     if (!milliseconds) return undefined;
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
-  const handleStopwatchStart = (
-    exerciseId: number,
-    setIndex: number,
-    exerciseName: string,
-  ) => {
-    setStopwatchState({
-      isRunning: true,
-      exerciseId,
-      setIndex,
-      exerciseName,
-      startTime: Date.now(),
-      currentTime: 0,
-    });
-  };
-
-  const handleStopwatchStop = () => {
-    if (
-      stopwatchState.exerciseId !== null &&
-      stopwatchState.setIndex !== null
-    ) {
-      onUpdateSet(stopwatchState.exerciseId, stopwatchState.setIndex, {
-        reps: stopwatchState.currentTime,
-      });
-    }
-    setStopwatchState({
-      isRunning: false,
-      exerciseId: null,
-      setIndex: null,
-      exerciseName: "",
-      startTime: null,
-      currentTime: 0,
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setStopwatchState({
-      isRunning: false,
-      exerciseId: null,
-      setIndex: null,
-      exerciseName: "",
-      startTime: null,
-      currentTime: 0,
-    });
   };
 
   return (
@@ -123,7 +54,7 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
             exercise={exercise}
             onUpdateSet={onUpdateSet}
             onAddSet={onAddSet}
-            onStopwatchStart={handleStopwatchStart}
+            onStopwatchStart={onStopwatchStart}
             formatTime={formatTime}
             isSetCompleted={(exerciseId, setIndex) =>
               completedSets[exerciseId]?.[setIndex] ?? false
@@ -132,13 +63,6 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
           />
         ))}
       </div>
-      <StopwatchDrawer
-        isRunning={stopwatchState.isRunning}
-        time={stopwatchState.currentTime}
-        onStop={handleStopwatchStop}
-        onClose={handleDrawerClose}
-        exerciseName={stopwatchState.exerciseName}
-      />
     </div>
   );
 };
