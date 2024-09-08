@@ -24,6 +24,8 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 2024/09/08
 
+- UX: adding loading.tsx to all (user_logged_in) subdirectories
+- UX: added suspense to all (user_logged_in) subdirectories
 - refactored everything to use tanstack query
 - fixed: exercises that are required on certain days are now shuffled into the routine correctly
 - UX: exercises page is no longer reloaded when deleting an exercise
