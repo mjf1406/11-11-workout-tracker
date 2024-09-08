@@ -18,8 +18,8 @@ const FrequentlyAskedQuestions: React.FC = () => {
       answer: (
         <>
           An 11-11 workout is comprised of 4 exercises: (1) upper body push, (2)
-          upper body pull, (3) lower body, and (4) abs. See what the research
-          says, thanks to Jeff Nippard&apos;s{" "}
+          upper body pull, (3) legs, and (4) abs. See what the research says,
+          thanks to Jeff Nippard&apos;s{" "}
           <a
             href="https://youtu.be/eTxO5ZMxcsc?si=86OH6vsPbtZyJcLD&t=244"
             target="_blank"

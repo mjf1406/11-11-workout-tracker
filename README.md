@@ -6,22 +6,31 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ### p2
 
-- optimized: rendering of `workout` no longer has the strange content shift
-- UX: exercises page is no longer reloaded when deleting an exercise
-- UX: exercise page is no longer reloaded when creating a new exercise
+- UX: exercises can be moved around using drag and drop on `/workout`
 
 ### p1
 
 - UI: we have a new logo!
 - UI: we have a new color scheme!
-- added: the tidbits of advice are now randomized on the `workout-complete` page
+- added: the tidbits of advice are now randomized on the `/workout/complete` page
 
 ### p0
 
 - added: dashboard page is no longer under construction
-- added: an exercise can now be edited on the exercises page
+- bug: the authbutton no longer flashes
 
 ## Change Log
+
+2024/09/08
+
+- refactored everything to use tanstack query
+- fixed: exercises that are required on certain days are now shuffled into the routine correctly
+- UX: exercises page is no longer reloaded when deleting an exercise
+- UX: exercise page is no longer reloaded when creating a new exercise
+- fixed: can now edit exercises
+- fixed: can now delete an exercise
+- optimized: rendering of `workout` no longer has the strange content shift
+- fixed: hitting done on a stopwatch exercise now adds the time to the field in the set
 
 2024/07/28
 

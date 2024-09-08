@@ -31,7 +31,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { ChevronDown } from "lucide-react";
-import { CreateExerciseDialog } from "~/app/exercises/createExerciseDialog";
+import { CreateExerciseDialog } from "~/app/(user_logged_in)/exercises/components/createExerciseDialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

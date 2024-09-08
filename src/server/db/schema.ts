@@ -1,6 +1,6 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
-import type { Days, Exercise } from "./types";
+import type { Days, ExerciseWorkout } from "./types";
 
 export const users = sqliteTable('users',
   {
@@ -37,7 +37,7 @@ export const workouts = sqliteTable('workouts',
   {
     id: integer('id', { mode: 'number' }).notNull().primaryKey({ autoIncrement: true }),
     user_id: text('user_id').notNull().references(() => users.user_id),
-    exercises: text('exercises', { mode: 'json' }).$type<Exercise[]>(),
+    exercises: text('exercises', { mode: 'json' }).$type<ExerciseWorkout[]>(),
     created_date: text('created_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
     updated_date: text('updated_date').default(sql`CURRENT_TIMESTAMP`).notNull(),
   }, (table) => {

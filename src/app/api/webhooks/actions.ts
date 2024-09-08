@@ -4,7 +4,7 @@ import {
     exercises as exercisesTable,
     settings as settingsTable
 } from "~/server/db/schema";
-import type { SettingsDb, UserDb } from "~/server/db/types";
+import type { Settings, User } from "~/server/db/types";
 import { clerkClient } from "@clerk/nextjs/server";
 import { EXERCISES, SETTINGS } from "~/lib/constants";
 
@@ -14,13 +14,11 @@ export default async function insertUser(userId: string) {
         const userName = `${user.firstName} ${user.lastName}`
         const userEmail = user.emailAddresses.find(i => i.id === user.primaryEmailAddressId)?.emailAddress
     
-        const data: UserDb = {
+        const data: User = {
             user_id: userId,
             user_name: userName,
             user_email: String(userEmail),
             user_role: 'user',
-            joined_date: undefined,
-            updated_date: undefined,
         }
         await db.insert(usersTable).values(data)
     } catch (err) {
@@ -37,7 +35,7 @@ export async function insertNewUserExercises(userId: string) {
         const exercises = EXERCISES.map(exercise => ({
             ...exercise,
             user_id: userId,
-          }));
+          }))
         await db.insert(exercisesTable).values(exercises)
     } catch (err) {
         const error = err as Error;
@@ -50,7 +48,7 @@ export async function insertNewUserSettings(userId: string) {
     if (!userId) throw new Error("User not authenticated")
     
     try {
-        const settings: SettingsDb = {...SETTINGS, user_id: userId}
+        const settings: Settings = {...SETTINGS, user_id: userId}
         await db.insert(settingsTable).values(settings)
     } catch (err) {
         const error = err as Error;

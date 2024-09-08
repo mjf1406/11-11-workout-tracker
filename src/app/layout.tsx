@@ -4,6 +4,7 @@ import { poppins } from "./fonts";
 import { Toaster } from "~/components/ui/toaster";
 import { ThemeProvider } from "~/components/theme/theme-provider";
 import { APP_NAME } from "~/lib/constants";
+import ReactQueryProvider from "./providers";
 
 export const metadata = {
   title: APP_NAME,
@@ -26,9 +27,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <GoogleOneTap />
-            <main>{children}</main>
-            <Toaster />
+            <ReactQueryProvider>
+              <GoogleOneTap />
+              <main>{children}</main>
+              <Toaster />
+            </ReactQueryProvider>
           </ThemeProvider>
         </body>
       </html>

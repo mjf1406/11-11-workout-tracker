@@ -1,89 +1,61 @@
 
-// Database
-export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sun" | "sat"
+export type Days = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 )[];
+export type FormattedDays = ( "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun" )[];
 
-export type SettingsDb = {
-    user_id: string,
-    upper_pull: number,
-    upper_push: number,
-    lower: number,
-    abs: number,
-    sets: number,
-    rest_duration: number,
-    created_date: string | undefined,
-    updated_date: string | undefined,
-}
-export type UserDb = {
-    user_id: string;
-    user_name: string;
-    user_email: string;
-    user_role: "user" | "admin",
-    joined_date: string | undefined;
-    updated_date: string | undefined;
-}
-export type ExerciseDb = {
-    id: number | undefined,
-    user_id: string,
-    name: string,
-    variant: string,
-    body_part: string,
-    type: string,
-    used: boolean,
-    unit: "reps" | "stopwatch",
-    forced_days: Days,
-    created_date: string | undefined,
-    updated_date: string | undefined,
-}
-export type Workout = {
-    id: number | undefined,
-    user_id: string,
-    exercises: Exercise[],
-    created_date: string | undefined,
-    updated_date: string | undefined,
-}
+export type User = {
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_role: "user" | "admin";
+  joined_date?: string;
+  updated_date?: string;
+};
+
+
 export type Exercise = {
-    id: number, // same id as in ExerciseDb
-    sets: Set[],
+  id: number;
+  user_id?: string;
+  name: string;
+  variant?: string;
+  body_part: string;
+  type?: string;
+  used?: boolean;
+  unit: "reps" | "stopwatch";
+  forced_days?: Days;
+  formatted_days?: FormattedDays;
+  created_date?: string;
+  updated_date?: string;
 }
-export type Set = {
-    weight: number,
-    reps: number,
+
+export type ExerciseWorkout = {
+  id: number;
+  sets: { weight: number; reps: number }[];
 }
-// Other stuff
-export type Routine = {
-    upper_pull: ExerciseDb[],
-    upper_push: ExerciseDb[],
-    lower: ExerciseDb[],
-    abs: ExerciseDb[],
+
+export type FilteredWorkoutData = {
+  exercises: ExerciseWorkout[];
 }
-export type ExerciseRoutine = {
-    id: number | undefined,
-    user_id: string,
-    name: string,
-    variant: string,
-    body_part: string,
-    type: string,
-    used: boolean,
-    unit: "reps" | "stopwatch",
-    forced_days: Days,
-    created_date: string | undefined,
-    updated_date: string | undefined,
-    previous_weight: number | undefined,
-    previous_reps: number | undefined
-    sets: undefined | Set[]
+
+export interface Workout {
+  id?: number;
+  user_id: string;
+  exercises: Exercise[];
+  created_date?: string;
+  updated_date?: string;
 }
-export type RoutineClient = {
-    upper_pull: ExerciseRoutine[],
-    upper_push: ExerciseRoutine[],
-    lower: ExerciseRoutine[],
-    abs: ExerciseRoutine[],
+
+export interface Settings {
+  user_id: string;
+  upper_pull: number;
+  upper_push: number;
+  lower: number;
+  abs: number;
+  sets: number;
+  rest_duration: number;
+  created_date?: string;
+  updated_date?: string;
 }
-export type Days = {
-  mon: boolean,
-  tue: boolean,
-  wed: boolean,
-  thu: boolean,
-  fri: boolean,
-  sat: boolean,
-  sun: boolean
-}
+
+export type ExercisesResponse = Exercise[];
+export type WorkoutsResponse = Workout[];
+export type SettingsResponse = Settings;

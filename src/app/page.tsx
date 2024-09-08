@@ -1,13 +1,14 @@
-import { Dumbbell } from "lucide-react";
+import { Activity } from "lucide-react";
 import Link from "next/link";
+import { ContentLayout } from "~/components/admin-panel/content-layout";
 import FrequentlyAskedQuestions from "~/components/brand/FAQ";
-import MainNav from "~/components/navigation/MainNav";
+import LoadingButton from "~/components/LoadingButton";
 import { Button } from "~/components/ui/button";
+import { APP_NAME } from "~/lib/constants";
 
 export default function HomePage() {
   return (
-    <>
-      <MainNav />
+    <ContentLayout title={APP_NAME}>
       <main className="flex min-h-screen flex-col items-center justify-center gap-32 bg-background p-5 text-foreground">
         <div
           id="hero"
@@ -26,11 +27,11 @@ export default function HomePage() {
             (within reason).
           </div>
           <div className="flex gap-5">
-            <Button asChild>
-              <Link href={"/workout"}>
-                <Dumbbell className="mr-2" /> Workout
-              </Link>
-            </Button>
+            <LoadingButton href="/workout">
+              <div className="flex items-center justify-center">
+                <Activity className="mr-2" /> Workout
+              </div>
+            </LoadingButton>
             <Button asChild variant={"secondary"}>
               <Link href={"#features"}>Learn more</Link>
             </Button>
@@ -48,6 +49,6 @@ export default function HomePage() {
         </div>
         <FrequentlyAskedQuestions />
       </main>
-    </>
+    </ContentLayout>
   );
 }
