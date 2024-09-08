@@ -1,9 +1,7 @@
-// app/(user_logged_in)/exercises/ExercisesClient.tsx
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { DataTable } from "~/components/ui/data-table";
 import { columns } from "./columns";
 import { fetchExercises } from "~/app/api/fetchers";
@@ -54,7 +52,7 @@ export type ExerciseWithFormattedDays = Omit<Exercise, "formatted_days"> & {
 };
 
 export default function ExercisesClient() {
-  const { data: exercises, isLoading } = useQuery<
+  const { data: exercises } = useSuspenseQuery<
     ExercisesResponse,
     Error,
     ExerciseWithFormattedDays[]
@@ -68,19 +66,10 @@ export default function ExercisesClient() {
       })),
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-96 w-full items-start justify-center">
-        <Loader2 className="mr-2 h-8 w-8 animate-spin" />
-        <span>Loading exercises...</span>
-      </div>
-    );
-  }
-
   return (
     <main className="flex flex-col items-center justify-center p-5 text-foreground">
       <div className="container mx-auto py-5">
-        <DataTable columns={columns} data={exercises ?? []} />
+        <DataTable columns={columns} data={exercises} />
       </div>
     </main>
   );

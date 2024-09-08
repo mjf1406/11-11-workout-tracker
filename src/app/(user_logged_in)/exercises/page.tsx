@@ -16,6 +16,8 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import Link from "next/link";
+import { Suspense } from "react";
+import LoadingData from "~/components/LoadingData";
 
 export default async function ExercisesPage() {
   const queryClient = new QueryClient();
@@ -41,7 +43,9 @@ export default async function ExercisesPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <ExercisesClient />
+        <Suspense fallback={<LoadingData />}>
+          <ExercisesClient />
+        </Suspense>
       </ContentLayout>
     </HydrationBoundary>
   );

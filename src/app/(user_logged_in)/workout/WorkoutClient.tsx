@@ -2,12 +2,6 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import {
-  fetchExercises,
-  fetchSettings,
-  fetchWorkouts,
-} from "~/app/api/fetchers";
 import { useWorkoutState } from "./hooks/useWorkoutState";
 import { useStopwatch } from "./hooks/useStopwatch";
 import { useRestTimer } from "./hooks/useRestTimer";
@@ -23,27 +17,20 @@ import type {
   Workout,
 } from "~/server/db/types";
 
-export default function WorkoutClient() {
+type WorkoutClientProps = {
+  initialSettings: Settings;
+  initialExercises: Exercise[];
+  initialWorkouts: Workout[];
+};
+
+export default function WorkoutClient({
+  initialSettings,
+  initialExercises,
+  initialWorkouts,
+}: WorkoutClientProps) {
   const [activeExerciseName, setActiveExerciseName] = useState("");
   const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
   const [activeSetIndex, setActiveSetIndex] = useState<number | null>(null);
-
-  const { data: settings, isLoading: isSettingsLoading } = useQuery<Settings>({
-    queryKey: ["settings"],
-    queryFn: fetchSettings,
-  });
-
-  const { data: exercises, isLoading: isExercisesLoading } = useQuery<
-    Exercise[]
-  >({
-    queryKey: ["exercises"],
-    queryFn: fetchExercises,
-  });
-
-  const { data: workouts, isLoading: isWorkoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["workouts"],
-    queryFn: fetchWorkouts,
-  });
 
   const {
     workout,
@@ -52,7 +39,7 @@ export default function WorkoutClient() {
     handleAddSet,
     handleSetComplete,
     generateWorkoutRoutine,
-  } = useWorkoutState(settings, exercises, workouts);
+  } = useWorkoutState(initialSettings, initialExercises, initialWorkouts);
 
   const {
     stopwatchTime,
@@ -69,13 +56,11 @@ export default function WorkoutClient() {
     adjustRestTimer,
     skipRestTimer,
     setDrawerOpen,
-  } = useRestTimer(settings?.rest_duration);
+  } = useRestTimer(initialSettings?.rest_duration);
 
   useEffect(() => {
-    if (settings && exercises && workouts) {
-      void generateWorkoutRoutine();
-    }
-  }, [settings, exercises, workouts, generateWorkoutRoutine]);
+    void generateWorkoutRoutine();
+  }, [generateWorkoutRoutine]);
 
   const handleStopwatchStart = useCallback(
     (exerciseId: number, setIndex: number, exerciseName: string) => {
@@ -163,12 +148,7 @@ export default function WorkoutClient() {
     return null;
   };
 
-  if (
-    isSettingsLoading ||
-    isExercisesLoading ||
-    isWorkoutsLoading ||
-    !workout
-  ) {
+  if (!workout) {
     return (
       <div className="flex h-96 w-full items-start justify-center">
         <Loader2 className="mr-2 h-8 w-8 animate-spin" />

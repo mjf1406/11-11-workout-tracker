@@ -1,15 +1,6 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { Suspense } from "react";
 import { ContentLayout } from "~/components/admin-panel/content-layout";
-import WorkoutClient from "./WorkoutClient";
-import {
-  fetchExercises,
-  fetchSettings,
-  fetchWorkouts,
-} from "~/app/api/fetchers";
+import WorkoutContent from "./WorkoutContent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,43 +10,27 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import Link from "next/link";
+import LoadingData from "~/components/LoadingData";
 
-export default async function WorkoutPage() {
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ["settings"],
-    queryFn: fetchSettings,
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["routine"],
-    queryFn: fetchExercises,
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["workouts"],
-    queryFn: fetchWorkouts,
-  });
-
+export default function WorkoutPage() {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ContentLayout title="Workout">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Workout</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <WorkoutClient />
-      </ContentLayout>
-    </HydrationBoundary>
+    <ContentLayout title="Workout">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Workout</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <Suspense fallback={<LoadingData />}>
+        <WorkoutContent />
+      </Suspense>
+    </ContentLayout>
   );
 }

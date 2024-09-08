@@ -18,6 +18,8 @@ import {
   fetchSettings,
   fetchWorkouts,
 } from "~/app/api/fetchers";
+import { Suspense } from "react";
+import LoadingData from "~/components/LoadingData";
 
 export default async function DashboardPage() {
   const queryClient = new QueryClient();
@@ -53,9 +55,11 @@ export default async function DashboardPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <main className="flex flex-col items-center justify-center gap-8 p-5 text-foreground">
-          <div className="text-2xl">🚧UNDER CONSTRUCTION🚧</div>
-        </main>
+        <Suspense fallback={<LoadingData />}>
+          <main className="flex flex-col items-center justify-center gap-8 p-5 text-foreground">
+            <div className="text-2xl">🚧UNDER CONSTRUCTION🚧</div>
+          </main>
+        </Suspense>
       </ContentLayout>
     </HydrationBoundary>
   );

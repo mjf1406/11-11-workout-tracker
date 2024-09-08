@@ -15,6 +15,8 @@ import {
 import Link from "next/link";
 import { fetchSettings } from "~/app/api/fetchers";
 import SettingsFormClient from "./SettingsFormClient";
+import { Suspense } from "react";
+import LoadingData from "~/components/LoadingData";
 
 export default async function SettingsPage() {
   const queryClient = new QueryClient();
@@ -39,9 +41,11 @@ export default async function SettingsPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <main className="m-auto flex w-full items-center justify-center p-5">
-          <SettingsFormClient />
-        </main>
+        <Suspense fallback={<LoadingData />}>
+          <main className="m-auto flex w-full items-center justify-center p-5">
+            <SettingsFormClient />
+          </main>
+        </Suspense>
       </ContentLayout>
     </HydrationBoundary>
   );

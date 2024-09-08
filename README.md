@@ -16,8 +16,9 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ### p0
 
-- added: dashboard page is no longer under construction
+- added: dashboard page has a calendar of days worked out and a current streak, only being broken by days not in the days off setting
 - bug: the auth button no longer flashes
+- added: settings now has a days off, where the user can set days they do not workout, so that their streaks are not affected
 
 ## Change Log
 
