@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -9,30 +9,38 @@ import {
   fetchWorkouts,
 } from "~/app/api/fetchers";
 import { useWorkoutState } from "./hooks/useWorkoutState";
-import { useRestTimer } from "./hooks/useRestTimer";
 import { useStopwatch } from "./hooks/useStopwatch";
+import { useRestTimer } from "./hooks/useRestTimer";
 import { WorkoutExerciseList } from "./components/WorkoutExerciseList";
 import { WorkoutControls } from "./components/WorkoutControls";
 import { RestTimerDrawer } from "./components/RestTimerDrawer";
 import { StopwatchDrawer } from "./components/StopwatchDrawer";
 import { toast } from "~/components/ui/use-toast";
-import type { FilteredWorkoutData } from "~/server/db/types";
+import type {
+  FilteredWorkoutData,
+  Settings,
+  Exercise,
+  Workout,
+} from "~/server/db/types";
 
 export default function WorkoutClient() {
-  const [isRestDrawerOpen, setIsRestDrawerOpen] = useState(false);
   const [activeExerciseName, setActiveExerciseName] = useState("");
+  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+  const [activeSetIndex, setActiveSetIndex] = useState<number | null>(null);
 
-  const { data: settings, isLoading: isSettingsLoading } = useQuery({
+  const { data: settings, isLoading: isSettingsLoading } = useQuery<Settings>({
     queryKey: ["settings"],
     queryFn: fetchSettings,
   });
 
-  const { data: exercises, isLoading: isExercisesLoading } = useQuery({
+  const { data: exercises, isLoading: isExercisesLoading } = useQuery<
+    Exercise[]
+  >({
     queryKey: ["exercises"],
     queryFn: fetchExercises,
   });
 
-  const { data: workouts, isLoading: isWorkoutsLoading } = useQuery({
+  const { data: workouts, isLoading: isWorkoutsLoading } = useQuery<Workout[]>({
     queryKey: ["workouts"],
     queryFn: fetchWorkouts,
   });
@@ -47,21 +55,23 @@ export default function WorkoutClient() {
   } = useWorkoutState(settings, exercises, workouts);
 
   const {
-    isResting,
-    restTimer,
-    startRestTimer,
-    adjustRestTimer,
-    skipRestTimer,
-  } = useRestTimer(settings?.rest_duration);
-
-  const {
     stopwatchTime,
     isRunning: isStopwatchRunning,
     startStopwatch,
     stopStopwatch,
   } = useStopwatch();
 
-  React.useEffect(() => {
+  const {
+    isResting,
+    restTimer,
+    isDrawerOpen,
+    startRestTimer,
+    adjustRestTimer,
+    skipRestTimer,
+    setDrawerOpen,
+  } = useRestTimer(settings?.rest_duration);
+
+  useEffect(() => {
     if (settings && exercises && workouts) {
       void generateWorkoutRoutine();
     }
@@ -70,20 +80,36 @@ export default function WorkoutClient() {
   const handleStopwatchStart = useCallback(
     (exerciseId: number, setIndex: number, exerciseName: string) => {
       setActiveExerciseName(exerciseName);
+      setActiveExerciseId(exerciseId);
+      setActiveSetIndex(setIndex);
       startStopwatch();
     },
     [startStopwatch],
   );
 
   const handleStopwatchStop = useCallback(() => {
-    stopStopwatch();
-    // Here you can add any additional logic needed when the stopwatch stops
-  }, [stopStopwatch]);
-
-  const handleStopwatchClose = useCallback(() => {
-    // Reset stopwatch state without updating the set
+    if (activeExerciseId !== null && activeSetIndex !== null) {
+      handleUpdateSet(activeExerciseId, activeSetIndex, {
+        reps: stopwatchTime,
+      });
+    }
     stopStopwatch();
     setActiveExerciseName("");
+    setActiveExerciseId(null);
+    setActiveSetIndex(null);
+  }, [
+    activeExerciseId,
+    activeSetIndex,
+    handleUpdateSet,
+    stopStopwatch,
+    stopwatchTime,
+  ]);
+
+  const handleStopwatchClose = useCallback(() => {
+    stopStopwatch();
+    setActiveExerciseName("");
+    setActiveExerciseId(null);
+    setActiveSetIndex(null);
   }, [stopStopwatch]);
 
   const handleSetCompleteWithRest = useCallback(
@@ -94,14 +120,15 @@ export default function WorkoutClient() {
         const exerciseIndex = workout.exercises.findIndex(
           (e) => e.id === exerciseId,
         );
-        const isLastExercise = exerciseIndex === workout.exercises.length - 1;
-        const exercise = workout.exercises[exerciseIndex];
+        const currentExercise = workout.exercises[exerciseIndex];
 
-        const isLastSet = setIndex === (exercise?.sets?.length ?? 0) - 1;
+        if (currentExercise) {
+          const isLastExercise = exerciseIndex === workout.exercises.length - 1;
+          const isLastSet = setIndex === currentExercise.sets.length - 1;
 
-        if (isLastExercise && !isLastSet) {
-          startRestTimer();
-          setIsRestDrawerOpen(true);
+          if (isLastExercise && !isLastSet) {
+            startRestTimer();
+          }
         }
       }
     },
@@ -163,8 +190,8 @@ export default function WorkoutClient() {
       <WorkoutControls onFinishWorkout={handleFinishWorkout} />
       <RestTimerDrawer
         isResting={isResting}
-        isOpen={isRestDrawerOpen}
-        onOpenChange={setIsRestDrawerOpen}
+        isOpen={isDrawerOpen}
+        onOpenChange={setDrawerOpen}
         restTimer={restTimer}
         onAdjustRest={adjustRestTimer}
         onSkipRest={skipRestTimer}

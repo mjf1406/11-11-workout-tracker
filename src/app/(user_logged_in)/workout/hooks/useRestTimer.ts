@@ -1,10 +1,9 @@
-// hooks/useRestTimer.ts
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-inferrable-types
-export const useRestTimer = (initialDuration: number = 90000) => {
+export const useRestTimer = (initialDuration = 90000) => {
   const [isResting, setIsResting] = useState(false);
   const [restTimer, setRestTimer] = useState(initialDuration);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -25,11 +24,16 @@ export const useRestTimer = (initialDuration: number = 90000) => {
           if (newTime === 1000) {
             void timerEnd.play();
           }
+          if (newTime <= 0) {
+            setIsResting(false);
+            setIsDrawerOpen(false);
+          }
           return newTime;
         });
       }, 100);
     } else if (restTimer === 0) {
       setIsResting(false);
+      setIsDrawerOpen(false);
     }
 
     return () => {
@@ -39,25 +43,33 @@ export const useRestTimer = (initialDuration: number = 90000) => {
     };
   }, [isResting, restTimer]);
 
-  const startRestTimer = () => {
+  const startRestTimer = useCallback(() => {
     setIsResting(true);
     setRestTimer(initialDuration);
-  };
+    setIsDrawerOpen(true);
+  }, [initialDuration]);
 
-  const adjustRestTimer = (milliseconds: number) => {
+  const adjustRestTimer = useCallback((milliseconds: number) => {
     setRestTimer((prev) => Math.max(0, prev + milliseconds));
-  };
+  }, []);
 
-  const skipRestTimer = () => {
+  const skipRestTimer = useCallback(() => {
     setIsResting(false);
     setRestTimer(0);
-  };
+    setIsDrawerOpen(false);
+  }, []);
+
+  const setDrawerOpen = useCallback((open: boolean) => {
+    setIsDrawerOpen(open);
+  }, []);
 
   return {
     isResting,
     restTimer,
+    isDrawerOpen,
     startRestTimer,
     adjustRestTimer,
     skipRestTimer,
+    setDrawerOpen,
   };
 };

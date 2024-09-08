@@ -1,4 +1,3 @@
-// components/RestTimerDrawer.tsx
 import React from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "~/components/ui/drawer";
 import { Button } from "~/components/ui/button";
@@ -31,7 +30,7 @@ export const RestTimerDrawer: React.FC<RestTimerDrawerProps> = ({
 
   const handleSkipRest = () => {
     onSkipRest();
-    onOpenChange(false); // Close the drawer
+    onOpenChange(false);
   };
 
   return (
@@ -39,17 +38,21 @@ export const RestTimerDrawer: React.FC<RestTimerDrawerProps> = ({
       <DrawerContent>
         <div className="p-4 text-center">
           <h2 className="mb-4 text-2xl font-bold">Rest Timer</h2>
-          <div className="mb-4 text-4xl">{formatTime(restTimer)}</div>
+          <div className="mb-4 text-4xl">
+            {formatTime(Math.max(0, restTimer))}
+          </div>
           <div className="mb-4 flex justify-center space-x-2">
             <Button
               variant={"secondary"}
               onClick={() => onAdjustRest(-SECOND * 30)}
+              disabled={restTimer <= 0}
             >
               -30s
             </Button>
             <Button
               variant={"secondary"}
               onClick={() => onAdjustRest(-SECOND * 10)}
+              disabled={restTimer <= 0}
             >
               -10s
             </Button>
@@ -76,7 +79,7 @@ export const RestTimerDrawer: React.FC<RestTimerDrawerProps> = ({
             onClick={() => onOpenChange(true)}
           >
             <Timer className="h-6 w-6" />
-            <span className="ml-2">{formatTime(restTimer)}</span>
+            <span className="ml-2">{formatTime(Math.max(0, restTimer))}</span>
           </Button>
         </DrawerTrigger>
       )}

@@ -17,7 +17,7 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 ### p0
 
 - added: dashboard page is no longer under construction
-- bug: the authbutton no longer flashes
+- bug: the auth button no longer flashes
 
 ## Change Log
 

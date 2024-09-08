@@ -6,15 +6,12 @@ export const MINUTE = SECOND * 60
 export const HOUR = MINUTE * 60
 export const DAY = HOUR * 24
 export const SETTINGS = {
-    user_id: "",
     upper_pull: 1,
     upper_push: 1,
     lower: 1,
     abs: 1,
     sets: 2,
     rest_duration: 3 * MINUTE,
-    created_date: undefined,
-    updated_date: undefined
   };
 export const EXERCISES: Omit<Exercise, "id">[] = [
   {"user_id":"","name":"pull-up","variant":"standard","body_part":"upper","type":"pull","used":false,"unit":"reps","forced_days":[]},
