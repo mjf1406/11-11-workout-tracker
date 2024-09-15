@@ -20,6 +20,7 @@ export async function createWorkout(workout: FilteredWorkoutData | null): Promis
         id: exercise.id,
         sets: exercise.sets,
       })),
+      used: 1, // Ensure the workout gets marked as used so it won't be used again until all others are used
     });
     
     return { success: true, message: 'Workout saved successfully!' };
