@@ -1,6 +1,9 @@
 
 export type Days = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 )[];
 export type FormattedDays = ( "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun" )[];
+export type ExerciseWithFormattedDays = Omit<Exercise, "formatted_days"> & {
+  formatted_days: FormattedDays | "Every day" | "None";
+};
 
 export type User = {
   user_id: string;

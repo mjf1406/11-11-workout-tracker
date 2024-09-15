@@ -20,24 +20,25 @@ import {
 } from "~/app/api/fetchers";
 import { Suspense } from "react";
 import LoadingData from "~/components/LoadingData";
+import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["settings"],
-    queryFn: fetchSettings,
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["workouts"],
-    queryFn: fetchWorkouts,
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["exercises"],
-    queryFn: fetchExercises,
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["settings"],
+      queryFn: fetchSettings,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["exercises"],
+      queryFn: fetchExercises,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["workouts"],
+      queryFn: fetchWorkouts,
+    }),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -56,9 +57,7 @@ export default async function DashboardPage() {
           </BreadcrumbList>
         </Breadcrumb>
         <Suspense fallback={<LoadingData />}>
-          <main className="flex flex-col items-center justify-center gap-8 p-5 text-foreground">
-            <div className="text-2xl">🚧UNDER CONSTRUCTION🚧</div>
-          </main>
+          <DashboardClient />
         </Suspense>
       </ContentLayout>
     </HydrationBoundary>

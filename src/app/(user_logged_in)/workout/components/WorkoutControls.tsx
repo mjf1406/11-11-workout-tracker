@@ -38,7 +38,6 @@ export const WorkoutControls: React.FC<WorkoutControlsProps> = ({
         description: "Your workout has been successfully saved.",
       });
       void queryClient.invalidateQueries({ queryKey: ["workout"] });
-      router.push("/workout/complete");
     },
     onError: (error) => {
       console.error("Failed to save workout:", error);
@@ -50,11 +49,10 @@ export const WorkoutControls: React.FC<WorkoutControlsProps> = ({
     },
   });
 
-  router.prefetch("/workout/complete");
-
   const handleFinishWorkout = async () => {
     const workoutData = await onFinishWorkout();
     if (workoutData) {
+      router.prefetch("/workout/complete");
       createWorkoutMutation.mutate(workoutData);
       setIsDialogOpen(false);
       router.push("/workout/complete");
@@ -87,6 +85,7 @@ export const WorkoutControls: React.FC<WorkoutControlsProps> = ({
             <Button
               onClick={handleFinishWorkout}
               disabled={createWorkoutMutation.isPending}
+              className="mb-4"
             >
               {createWorkoutMutation.isPending ? (
                 <>

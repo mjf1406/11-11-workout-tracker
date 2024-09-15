@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@clerk/nextjs/server'
 import type { FilteredWorkoutData } from '~/server/db/types';
+import { markExercisesAsUsed } from '../exercises/actions';
 
 export async function createWorkout(workout: FilteredWorkoutData | null): Promise<{ success: boolean; message: string }> {
   if (!workout) return { success: false, message: "No workout data found. Please try again." };
@@ -20,9 +21,10 @@ export async function createWorkout(workout: FilteredWorkoutData | null): Promis
         id: exercise.id,
         sets: exercise.sets,
       })),
-      used: 1, // Ensure the workout gets marked as used so it won't be used again until all others are used
     });
-    
+
+    const response = await markExercisesAsUsed(workout.exercises)
+
     return { success: true, message: 'Workout saved successfully!' };
   } catch (error) {
     console.error('Error saving workout:', error);

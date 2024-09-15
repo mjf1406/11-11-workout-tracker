@@ -22,6 +22,11 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ## Change Log
 
+2024/09/16
+
+- fixed: exercises are now marked as used correctly
+- added: dashboard now has a basic page
+
 2024/09/08
 
 - UX: adding loading.tsx to all (user_logged_in) subdirectories
