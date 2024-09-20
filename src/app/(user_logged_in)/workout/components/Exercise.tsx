@@ -53,7 +53,7 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="mb-4 flex flex-col gap-2 rounded-xl bg-foreground/10 px-4 py-1"
+      className="mb-4 flex touch-none flex-col gap-2 rounded-xl bg-foreground/10 px-4 py-1"
     >
       <div className="grid grid-cols-10">
         <div
