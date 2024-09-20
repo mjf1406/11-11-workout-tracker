@@ -6,8 +6,6 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ### p2
 
-- UX: exercises can be moved around using drag and drop on `/workout`
-
 ### p1
 
 - UI: we have a new logo!
@@ -21,6 +19,10 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 - added: settings now has a days off, where the user can set days they do not workout, so that their streaks are not affected
 
 ## Change Log
+
+2024/09/20
+
+- UX: exercises can be moved around using drag and drop on `/workout`
 
 2024/09/16
 
