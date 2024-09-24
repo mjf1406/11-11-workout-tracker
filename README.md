@@ -20,6 +20,10 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 
 ## Change Log
 
+2024/09/24
+
+- fixed: inputs now correctly work inside each exercise card
+
 2024/09/20
 
 - UX: exercises can be moved around using drag and drop on `/workout`

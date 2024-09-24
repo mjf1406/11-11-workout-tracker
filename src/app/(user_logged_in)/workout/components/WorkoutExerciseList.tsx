@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ExerciseComponent } from "./Exercise";
 import type { Exercise, Workout } from "~/server/db/types";
 import {
@@ -65,6 +65,11 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
   const [exercises, setExercises] = useState<WorkoutData["exercises"]>(
     workout.exercises,
   );
+
+  useEffect(() => {
+    setExercises(workout.exercises);
+  }, []);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor),
@@ -72,6 +77,40 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const handleLocalUpdateSet = (
+    exerciseId: number,
+    setIndex: number,
+    updateData: { weight?: number; reps?: number },
+  ) => {
+    setExercises((prevExercises) =>
+      prevExercises.map((exercise) =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: exercise.sets.map((set, index) =>
+                index === setIndex ? { ...set, ...updateData } : set,
+              ),
+            }
+          : exercise,
+      ),
+    );
+    onUpdateSet(exerciseId, setIndex, updateData);
+  };
+
+  const handleLocalAddSet = (exerciseId: number) => {
+    setExercises((prevExercises) =>
+      prevExercises.map((exercise) =>
+        exercise.id === exerciseId
+          ? {
+              ...exercise,
+              sets: [...exercise.sets, { weight: 0, reps: 0, isNewSet: true }],
+            }
+          : exercise,
+      ),
+    );
+    onAddSet(exerciseId);
+  };
 
   return (
     <div className="m-auto flex w-full flex-col items-center justify-center md:max-w-[500px]">
@@ -82,20 +121,6 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
           onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis]}
         >
-          {/* {workout.exercises.map((exercise) => (
-            <ExerciseComponent
-              key={exercise.id}
-              exercise={exercise}
-              onUpdateSet={onUpdateSet}
-              onAddSet={onAddSet}
-              onStopwatchStart={onStopwatchStart}
-              formatTime={formatTime}
-              isSetCompleted={(exerciseId, setIndex) =>
-                completedSets[exerciseId]?.[setIndex] ?? false
-              }
-              onSetComplete={onSetComplete}
-            />
-          ))} */}
           <SortableContext
             items={exercises}
             strategy={verticalListSortingStrategy}
@@ -104,8 +129,8 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
               <ExerciseComponent
                 key={exercise.id}
                 exercise={exercise}
-                onUpdateSet={onUpdateSet}
-                onAddSet={onAddSet}
+                onUpdateSet={handleLocalUpdateSet}
+                onAddSet={handleLocalAddSet}
                 onStopwatchStart={onStopwatchStart}
                 formatTime={formatTime}
                 isSetCompleted={(exerciseId, setIndex) =>
@@ -124,15 +149,15 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setExercises((exercises) => {
-        const oldIndex = exercises.findIndex(
+      setExercises((prevExercises) => {
+        const oldIndex = prevExercises.findIndex(
           (exercise) => exercise.id === active.id,
         );
-        const newIndex = exercises.findIndex(
+        const newIndex = prevExercises.findIndex(
           (exercise) => exercise.id === over.id,
         );
 
-        return arrayMove(exercises, oldIndex, newIndex);
+        return arrayMove(prevExercises, oldIndex, newIndex);
       });
     }
   }

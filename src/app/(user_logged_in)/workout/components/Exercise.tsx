@@ -1,7 +1,5 @@
-"use client";
-
 import { GripVertical } from "lucide-react";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -43,23 +41,51 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
   isSetCompleted,
   onSetComplete,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: exercise.id });
+  const [isInteractingWithInput, setIsInteractingWithInput] = useState(false);
+  const dragHandleRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({
+    id: exercise.id,
+    disabled: isInteractingWithInput,
+  });
+
+  useEffect(() => {
+    setIsDragging(isSortableDragging);
+  }, [isSortableDragging]);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    opacity: isDragging ? 0.5 : 1,
   };
+
+  const handleDragHandleMouseDown = (e: React.MouseEvent) => {
+    if (dragHandleRef.current?.contains(e.target as Node)) {
+      setIsInteractingWithInput(false);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="mb-4 flex touch-none flex-col gap-2 rounded-xl bg-foreground/10 px-4 py-1"
+      className="mb-4 flex flex-col gap-2 rounded-xl bg-foreground/10 px-4 py-1"
     >
       <div className="grid grid-cols-10">
         <div
-          className="col-span-1 -ml-5 self-center"
+          ref={dragHandleRef}
+          className="col-span-1 -ml-5 touch-none self-center"
           {...attributes}
           {...listeners}
+          onMouseDown={handleDragHandleMouseDown}
         >
           <GripVertical size={40} className="cursor-move" />
         </div>
