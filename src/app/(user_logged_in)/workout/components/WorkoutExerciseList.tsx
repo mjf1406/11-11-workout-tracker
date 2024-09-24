@@ -68,6 +68,7 @@ export const WorkoutExerciseList: React.FC<WorkoutExerciseListProps> = ({
 
   useEffect(() => {
     setExercises(workout.exercises);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const sensors = useSensors(

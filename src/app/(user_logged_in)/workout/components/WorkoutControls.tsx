@@ -1,4 +1,3 @@
-// components/WorkoutControls.tsx
 import React from "react";
 import { BicepsFlexed, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -38,6 +37,7 @@ export const WorkoutControls: React.FC<WorkoutControlsProps> = ({
         description: "Your workout has been successfully saved.",
       });
       void queryClient.invalidateQueries({ queryKey: ["workout"] });
+      router.push("/workout/complete");
     },
     onError: (error) => {
       console.error("Failed to save workout:", error);
@@ -52,10 +52,8 @@ export const WorkoutControls: React.FC<WorkoutControlsProps> = ({
   const handleFinishWorkout = async () => {
     const workoutData = await onFinishWorkout();
     if (workoutData) {
-      router.prefetch("/workout/complete");
-      createWorkoutMutation.mutate(workoutData);
       setIsDialogOpen(false);
-      router.push("/workout/complete");
+      createWorkoutMutation.mutate(workoutData);
     } else {
       setIsDialogOpen(false);
     }

@@ -23,6 +23,7 @@ This starts with [create t3-app](https://create.t3.gg/) and adds boilerplate for
 2024/09/24
 
 - fixed: inputs now correctly work inside each exercise card
+- fixed: user now properly directed to /workout/complete upon workout completion
 
 2024/09/20
 

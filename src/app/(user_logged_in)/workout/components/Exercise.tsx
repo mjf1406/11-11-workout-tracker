@@ -44,6 +44,7 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
   const [isInteractingWithInput, setIsInteractingWithInput] = useState(false);
   const dragHandleRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [initialSets, setInitialSets] = useState(exercise.sets);
 
   const {
     attributes,
@@ -61,6 +62,18 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
     setIsDragging(isSortableDragging);
   }, [isSortableDragging]);
 
+  useEffect(() => {
+    // Update initialSets only when new sets are added
+    if (exercise.sets.length > initialSets.length) {
+      setInitialSets((prevSets) => [
+        ...prevSets,
+        ...exercise.sets
+          .slice(prevSets.length)
+          .map((set) => ({ ...set, isNewSet: true })),
+      ]);
+    }
+  }, [exercise.sets, initialSets]);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -71,6 +84,20 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
     if (dragHandleRef.current?.contains(e.target as Node)) {
       setIsInteractingWithInput(false);
     }
+  };
+
+  const renderPreviousSetInfo = (setIndex: number) => {
+    const initialSet = initialSets[setIndex];
+    if (!initialSet || initialSet.isNewSet) {
+      return "N/A";
+    }
+    if (exercise.unit === "stopwatch") {
+      return formatTime(initialSet.reps);
+    }
+    if (initialSet.weight > 0 || initialSet.reps > 0) {
+      return `${initialSet.weight} x ${initialSet.reps}`;
+    }
+    return "-";
   };
 
   return (
@@ -116,13 +143,7 @@ export const ExerciseComponent: React.FC<ExerciseProps> = ({
               >
                 <div className="col-span-1 text-center">{setIndex + 1}</div>
                 <div className="col-span-1 text-center">
-                  {set.isNewSet
-                    ? "N/A"
-                    : exercise.unit === "stopwatch"
-                      ? formatTime(set.reps)
-                      : set.weight > 0 || set.reps > 0
-                        ? `${set.weight} x ${set.reps}`
-                        : "-"}
+                  {renderPreviousSetInfo(setIndex)}
                 </div>
                 <div className="col-span-2 text-center">
                   <Input
